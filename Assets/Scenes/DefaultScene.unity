@@ -158,53 +158,69 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!1 &1435676269
+--- !u!1 &1583865885
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1435676271}
-  - 114: {fileID: 1435676270}
-  - 82: {fileID: 1435676272}
+  - 4: {fileID: 1583865888}
+  - 148: {fileID: 1583865887}
+  - 114: {fileID: 1583865886}
+  - 114: {fileID: 1583865890}
+  - 82: {fileID: 1583865889}
   m_Layer: 0
-  m_Name: MicrophoneListener
+  m_Name: NetworkManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1435676270
+--- !u!114 &1583865886
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1435676269}
+  m_GameObject: {fileID: 1583865885}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a544f9707e734e44859f5a28c0d3df1, type: 3}
+  m_Script: {fileID: 11500000, guid: be5da0fd498a37041a01118378b9b771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordingFrequency: 44100
---- !u!4 &1435676271
+  NumberOfPlayers: 2
+  PlayerNumber: 0
+  nv: {fileID: 0}
+--- !u!148 &1583865887
+NetworkView:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1583865885}
+  m_Enabled: 1
+  m_StateSynchronization: 0
+  m_Observed: {fileID: 1583865888}
+  m_ViewID:
+    m_ID: 1
+    m_Type: 1
+--- !u!4 &1583865888
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1435676269}
+  m_GameObject: {fileID: 1583865885}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
---- !u!82 &1435676272
+--- !u!82 &1583865889
 AudioSource:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1435676269}
+  m_GameObject: {fileID: 1583865885}
   m_Enabled: 1
   serializedVersion: 3
   m_audioClip: {fileID: 0}
@@ -257,24 +273,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
---- !u!1 &1583865885
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1583865888}
-  - 148: {fileID: 1583865887}
-  - 114: {fileID: 1583865886}
-  m_Layer: 0
-  m_Name: NetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1583865886
+--- !u!114 &1583865890
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -282,32 +281,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1583865885}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be5da0fd498a37041a01118378b9b771, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a544f9707e734e44859f5a28c0d3df1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfPlayers: 2
-  PlayerNumber: 0
---- !u!148 &1583865887
-NetworkView:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1583865885}
-  m_Enabled: 1
-  m_StateSynchronization: 0
-  m_Observed: {fileID: 1583865888}
-  m_ViewID:
-    m_ID: 1
-    m_Type: 1
---- !u!4 &1583865888
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1583865885}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  recordingFrequency: 10000

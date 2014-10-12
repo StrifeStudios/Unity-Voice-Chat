@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(NetworkView))]
 public class MicrophoneListener : MonoBehaviour
 {
     private string selectedDevice = null;
@@ -12,6 +13,9 @@ public class MicrophoneListener : MonoBehaviour
     private bool isRecording = false;
 
     private List<AudioClip> recordings = new List<AudioClip>();
+
+	int lastSample;
+	AudioClip c;
 
 	void Start()
 	{
@@ -30,6 +34,21 @@ public class MicrophoneListener : MonoBehaviour
             this.selectedDevice = options[0];
         }
     }
+
+	void Update()
+	{
+		if (networkView.isMine && NetworkManager.gameStarted) {
+			int pos = Microphone.GetPosition(null);
+			int diff = pos-lastSample;
+			if (diff > 0) {
+				float[] samples = new float[diff * c.channels];
+				c.GetData(samples, lastSample);
+				byte[] ba = ToByteArray(samples);
+				networkView.RPC("Send", RPCMode.Others, ba, c.channels);
+			}
+			lastSample = pos;
+		}
+	}
 
     void OnGUI()
     {
@@ -105,5 +124,34 @@ public class MicrophoneListener : MonoBehaviour
 	private void OnGameStart()
 	{
 		//Do something related to the game starting
+	}
+
+	[RPC]
+	public void Send(byte[] ba, int chan) {
+		float[] f = ToFloatArray(ba);
+		audio.clip = AudioClip.Create("test", f.Length, chan, recordingFrequency, true, false);
+		audio.clip.SetData(f, 0);
+		if (!audio.isPlaying) audio.Play();
+	}
+	
+	public byte[] ToByteArray(float[] floatArray) {
+		int len = floatArray.Length * 4;
+		byte[] byteArray = new byte[len];
+		int pos = 0;
+		foreach (float f in floatArray) {
+			byte[] data = System.BitConverter.GetBytes(f);
+			System.Array.Copy(data, 0, byteArray, pos, 4);
+			pos += 4;
+		}
+		return byteArray;
+	}
+	
+	public float[] ToFloatArray(byte[] byteArray) {
+		int len = byteArray.Length / 4;
+		float[] floatArray = new float[len];
+		for (int i = 0; i < byteArray.Length; i+=4) {
+			floatArray[i/4] = System.BitConverter.ToSingle(byteArray, i);
+		}
+		return floatArray;
 	}
 }
