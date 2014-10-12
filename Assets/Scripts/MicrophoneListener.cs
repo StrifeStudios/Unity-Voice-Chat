@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class MicrophoneListener : MonoBehaviour
 {
@@ -9,6 +10,20 @@ public class MicrophoneListener : MonoBehaviour
     private AudioClip audioClip;
 
     private string frequencyInputString = "10000";
+
+    void Awake()
+    {
+        var options = Microphone.devices;
+        if (options.Length == 0)
+        {
+            throw new InvalidOperationException("There is no recording device detected.");
+        }
+        else
+        {
+            this.selectedDevice = options[0];
+        }
+    }
+
     void OnGUI()
     {
         GUILayout.BeginVertical();
