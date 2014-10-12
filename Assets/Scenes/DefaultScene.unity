@@ -190,7 +190,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NumberOfPlayers: 2
   PlayerNumber: 0
-  nv: {fileID: 0}
 --- !u!148 &1583865887
 NetworkView:
   m_ObjectHideFlags: 0

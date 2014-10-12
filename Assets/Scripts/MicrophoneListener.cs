@@ -15,7 +15,6 @@ public class MicrophoneListener : MonoBehaviour
     private List<AudioClip> recordings = new List<AudioClip>();
 
 	int lastSample;
-	AudioClip c;
 
 	void Start()
 	{
@@ -41,10 +40,10 @@ public class MicrophoneListener : MonoBehaviour
 			int pos = Microphone.GetPosition(null);
 			int diff = pos-lastSample;
 			if (diff > 0) {
-				float[] samples = new float[diff * c.channels];
-				c.GetData(samples, lastSample);
+				float[] samples = new float[diff * currentRecordingClip.channels];
+				currentRecordingClip.GetData(samples, lastSample);
 				byte[] ba = ToByteArray(samples);
-				networkView.RPC("Send", RPCMode.Others, ba, c.channels);
+				networkView.RPC("Send", RPCMode.Others, ba, currentRecordingClip.channels);
 			}
 			lastSample = pos;
 		}
@@ -128,6 +127,7 @@ public class MicrophoneListener : MonoBehaviour
 
 	[RPC]
 	public void Send(byte[] ba, int chan) {
+        Debug.Log("Received data: " + ba.Length);
 		float[] f = ToFloatArray(ba);
 		audio.clip = AudioClip.Create("test", f.Length, chan, recordingFrequency, true, false);
 		audio.clip.SetData(f, 0);
