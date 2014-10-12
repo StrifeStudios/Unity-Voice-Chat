@@ -1,0 +1,13 @@
+# Ignore everything in the root directory
+/*
+# Except the following folders/files
+!.gitignore
+!.gitattributes
+!README.md
+!Assets/
+!ProjectSettings/
+ProjectSettings/QualitySettings.asset
+ProjectSettings/QualitySettings
+ProjectSettings/QualitySettings.*
+QualitySettings.asset
+Thumbs.db
