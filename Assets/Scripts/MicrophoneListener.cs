@@ -103,7 +103,7 @@ public class MicrophoneListener : MonoBehaviour
 
     private void RecordButtonPressed()
     {
-        this.currentRecordingClip = Microphone.Start(selectedDevice, false, 10, recordingFrequency);
+        this.currentRecordingClip = Microphone.Start(selectedDevice, false, 100, recordingFrequency);
     }
 
     private void StopButtonPressed()
