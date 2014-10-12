@@ -8,6 +8,7 @@ public class MicrophoneListener : MonoBehaviour
     [SerializeField]
     private int recordingFrequency = 10000;
     private AudioClip audioClip;
+	private bool isRecording = false;
 
     private string frequencyInputString = "10000";
 
@@ -54,13 +55,18 @@ public class MicrophoneListener : MonoBehaviour
         GUILayout.Space(50);
         if (selectedDevice != null)
         {
-            if (GUILayout.Button("Record"))
+            if (GUILayout.Button(isRecording ? "Stop" : "Record"))
             {
-                RecordButtonPressed();
+				isRecording = !isRecording;
+				if (isRecording) {
+                	RecordButtonPressed();
+				} else {
+					StopButtonPressed();
+				}
             }
-            if (GUILayout.Button("Stop"))
+            if (GUILayout.Button("Play"))
             {
-                StopButtonPressed();
+				PlaySoundClip();
             }
         }
         GUILayout.EndVertical();
@@ -74,6 +80,10 @@ public class MicrophoneListener : MonoBehaviour
     private void StopButtonPressed()
     {
         Microphone.End(selectedDevice);
-        this.audio.PlayOneShot(audioClip);
     }
+
+	private void PlaySoundClip() 
+	{
+		this.audio.PlayOneShot(audioClip);
+	}
 }
