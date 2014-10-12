@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class MicrophoneListener : MonoBehaviour
 {
     private string selectedDevice = null;
     [SerializeField]
     private int recordingFrequency = 10000;
-    private AudioClip audioClip;
-	private bool isRecording = false;
+    private AudioClip currentRecordingClip;
+    private bool isRecording = false;
+
+    private List<AudioClip> recordings = new List<AudioClip>();
 
     void Awake()
     {
@@ -52,16 +55,37 @@ public class MicrophoneListener : MonoBehaviour
         {
             if (GUILayout.Button(isRecording ? "Stop" : "Record"))
             {
-				isRecording = !isRecording;
-				if (isRecording) {
-                	RecordButtonPressed();
-				} else {
-					StopButtonPressed();
-				}
+                isRecording = !isRecording;
+                if (isRecording)
+                {
+                    RecordButtonPressed();
+                }
+                else
+                {
+                    StopButtonPressed();
+                }
             }
             if (GUILayout.Button("Play"))
             {
-				PlaySoundClip();
+                PlaySoundClip();
+            }
+        }
+        GUILayout.Space(25);
+        foreach (var recording in this.recordings)
+        {           
+            if (this.currentRecordingClip == recording)
+            {
+                GUI.contentColor = Color.cyan;
+            }
+            else
+            {
+                GUI.contentColor = Color.white;
+            }
+
+            if (GUILayout.Button(recording.name))
+            {
+                this.currentRecordingClip = recording;
+                PlaySoundClip();
             }
         }
         GUILayout.EndVertical();
@@ -69,16 +93,20 @@ public class MicrophoneListener : MonoBehaviour
 
     private void RecordButtonPressed()
     {
-        this.audioClip = Microphone.Start(selectedDevice, false, 10, recordingFrequency);
+        this.currentRecordingClip = Microphone.Start(selectedDevice, false, 10, recordingFrequency);
     }
 
     private void StopButtonPressed()
     {
         Microphone.End(selectedDevice);
+        if (this.currentRecordingClip != null)
+        {
+            recordings.Add(currentRecordingClip);
+        }
     }
 
-	private void PlaySoundClip() 
-	{
-		this.audio.PlayOneShot(audioClip);
-	}
+    private void PlaySoundClip()
+    {
+        this.audio.PlayOneShot(currentRecordingClip);
+    }
 }
