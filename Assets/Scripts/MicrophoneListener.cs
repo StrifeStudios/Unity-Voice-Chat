@@ -126,8 +126,8 @@ public class MicrophoneListener : MonoBehaviour
 	}
 
 	[RPC]
-	public void Send(byte[] ba, int chan) {
-        Debug.Log("Received data: " + ba.Length);
+	public void Send(byte[] ba, int chan)
+	{
 		float[] f = ToFloatArray(ba);
 		audio.clip = AudioClip.Create("test", f.Length, chan, recordingFrequency, true, false);
 		audio.clip.SetData(f, 0);
