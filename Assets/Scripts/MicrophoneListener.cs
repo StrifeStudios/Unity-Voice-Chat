@@ -36,7 +36,7 @@ public class MicrophoneListener : MonoBehaviour
 
     void Update()
     {
-        if (networkView.isMine && NetworkManager.gameStarted)
+        if (NetworkManager.gameStarted)
         {
             int pos = Microphone.GetPosition(null);
             int diff = pos - lastSample;
@@ -47,7 +47,8 @@ public class MicrophoneListener : MonoBehaviour
                 byte[] ba = ToByteArray(samples);
                 if (Network.isClient)
                 {
-                    networkView.RPC("SendClientToServer", RPCMode.Server, ba, currentRecordingClip.channels);
+                    Debug.Log("Routing through server");
+                    networkView.RPC("RouteThroughServer", RPCMode.Server, ba, currentRecordingClip.channels);
                 }
                 else
                 {
@@ -161,8 +162,9 @@ public class MicrophoneListener : MonoBehaviour
     }
 
     [RPC]
-    public void SendClientToServer(byte[] ba, int chan)
+    public void RouteThroughServer(byte[] ba, int chan)
     {
+        Debug.Log("Received client thing");
         networkView.RPC("Send", RPCMode.Others, ba, chan);
         Send(ba, chan);
     }
