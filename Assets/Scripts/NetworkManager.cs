@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(NetworkView))]
 public class NetworkManager : Singleton<NetworkManager>
-{
-	private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-	
-	private string gameTypeName = "Sample_LockStep_Network";
+{	
+	private string gameTypeName = "Voice Chat";
 	private bool refreshing = false;
 	private HostData[] hostData;
 	//TODO: Add ability to allow hosting user to set this number
@@ -19,6 +17,8 @@ public class NetworkManager : Singleton<NetworkManager>
 	public static event NetworkManagerEvent OnConnectedToGame;
 	public static event NetworkManagerEvent OnGameStart;
 	public static bool gameStarted = false;
+
+	public int PlayerNumber = 0;
 	
 	private NetworkView nv;
 	
@@ -43,7 +43,7 @@ public class NetworkManager : Singleton<NetworkManager>
 			if (MasterServer.PollHostList().Length > 0)
 			{
 				refreshing = false;
-				log.Debug("HostList Length: " + MasterServer.PollHostList().Length);
+				Debug.Log("HostList Length: " + MasterServer.PollHostList().Length);
 				hostData = MasterServer.PollHostList();
 			}
 		}
@@ -51,13 +51,13 @@ public class NetworkManager : Singleton<NetworkManager>
 	
 	private void startServer()
 	{
-		log.Debug("startServer called");
+		Debug.Log("startServer called");
 		
 		bool useNAT = !Network.HavePublicAddress();
 		Network.InitializeServer(32, 25001, useNAT);
 		MasterServer.RegisterHost(gameTypeName, gameName, NetworkHostMessages.GenerateHostComment(NumberOfPlayers));
 		players.Add(Network.player.ToString(), Network.player);
-		Player.Instance.PlayerNumber = 0;
+		PlayerNumber = 0;
 	}
 	
 	private void refreshHostList()
@@ -69,14 +69,14 @@ public class NetworkManager : Singleton<NetworkManager>
 	private void PrintHostData()
 	{
 		HostData[] hostData = MasterServer.PollHostList();
-		log.Debug("HostData length " + hostData.Length);
+		Debug.Log("HostData length " + hostData.Length);
 	}
 	
 	#region Messages
 	private void OnServerInitialized()
 	{
-		log.Debug("Server initialized");
-		log.Debug("Expected player count : " + NumberOfPlayers);
+		Debug.Log("Server initialized");
+		Debug.Log("Expected player count : " + NumberOfPlayers);
 		//Notify any delegates that we are connected to the game
 		if (OnConnectedToGame != null)
 		{
@@ -86,20 +86,20 @@ public class NetworkManager : Singleton<NetworkManager>
 	
 	private void OnMasterServerEvent(MasterServerEvent mse)
 	{
-		log.Debug("Master Server Event: " + mse.ToString());
+		Debug.Log("Master Server Event: " + mse.ToString());
 	}
 	
 	private void OnPlayerConnected(NetworkPlayer player)
 	{
 		players.Add(player.ToString(), player);
-		log.Debug("OnPlayerConnected, playerID:" + player.ToString());
-		log.Debug("Player Count : " + players.Count);
+		Debug.Log("OnPlayerConnected, playerID:" + player.ToString());
+		Debug.Log("Player Count : " + players.Count);
 		//Once all expected players have joined, send all clients the list of players
 		if (players.Count == NumberOfPlayers)
 		{
 			foreach (NetworkPlayer p in players.Values)
 			{
-				log.Debug("Calling RegisterPlayerAll...");
+				Debug.Log("Calling RegisterPlayerAll...");
 				nv.RPC("RegisterPlayerAll", RPCMode.Others, p);
 			}
 			
@@ -114,7 +114,7 @@ public class NetworkManager : Singleton<NetworkManager>
 	[RPC]
 	public void RegisterPlayerAll(NetworkPlayer player)
 	{
-		log.Debug("Register Player All called for " + player.ToString());
+		Debug.Log("Register Player All called for " + player.ToString());
 		players.Add(player.ToString(), player);
 	}
 	
@@ -132,12 +132,12 @@ public class NetworkManager : Singleton<NetworkManager>
 	void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
 		if (Network.isServer)
-			log.Debug("Local server connection disconnected");
+			Debug.Log("Local server connection disconnected");
 		else
 			if (info == NetworkDisconnection.LostConnection)
-				log.Debug("Lost connection to the server");
+				Debug.Log("Lost connection to the server");
 		else
-			log.Debug("Successfully diconnected from the server");
+			Debug.Log("Successfully diconnected from the server");
 	}
 	#endregion
 	
@@ -147,7 +147,7 @@ public class NetworkManager : Singleton<NetworkManager>
 		if (!gameStarted)
 		{
 			//Draw the background to the menu
-			GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Util.whiteSquare);
+			//GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Util.whiteSquare);
 		}
 		
 		if (!Network.isClient && !Network.isServer)
@@ -173,7 +173,7 @@ public class NetworkManager : Singleton<NetworkManager>
 			                     GUILayout.Width(125f * Util.GetScale()),
 			                     GUILayout.Height(50f * Util.GetScale())))
 			{
-				log.Debug("Starting Server");
+				Debug.Log("Starting Server");
 				startServer();
 			}
 			
@@ -183,7 +183,7 @@ public class NetworkManager : Singleton<NetworkManager>
 			                     GUILayout.Width(125f * Util.GetScale()),
 			                     GUILayout.Height(50f * Util.GetScale())))
 			{
-				log.Debug("Refreshing Hosts");
+				Debug.Log("Refreshing Hosts");
 				refreshHostList();
 			}
 			GUILayout.FlexibleSpace();
@@ -213,7 +213,7 @@ public class NetworkManager : Singleton<NetworkManager>
 					                     GUILayout.Width(200f * Util.GetScale()),
 					                     GUILayout.Height(25f * Util.GetScale())))
 					{
-						log.Debug("Connecting to server");
+						Debug.Log("Connecting to server");
 						Network.Connect(hd);
 						//Notify any delegates that we are connected to the game
 						if (OnConnectedToGame != null)
