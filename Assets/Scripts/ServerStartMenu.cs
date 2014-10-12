@@ -6,7 +6,6 @@ public class ServerStartMenu : MonoBehaviour
     [SerializeField]
     private Rect drawArea = new Rect(500, 0, 300, 1000);
     private int listenPort = 21000;
-    private int recordingFrequency = 10000;
     [SerializeField]
     private int maxConnections = 32;
     void OnGUI()
