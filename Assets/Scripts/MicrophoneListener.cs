@@ -164,6 +164,7 @@ public class MicrophoneListener : MonoBehaviour
     public void SendClientToServer(byte[] ba, int chan)
     {
         networkView.RPC("Send", RPCMode.Others, ba, chan);
+        Send(ba, chan);
     }
 
     public byte[] ToByteArray(float[] floatArray)
