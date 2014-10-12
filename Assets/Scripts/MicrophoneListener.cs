@@ -13,6 +13,11 @@ public class MicrophoneListener : MonoBehaviour
 
     private List<AudioClip> recordings = new List<AudioClip>();
 
+	void Start()
+	{
+		NetworkManager.OnGameStart += OnGameStart;
+	}
+
     void Awake()
     {
         var options = Microphone.devices;
@@ -28,67 +33,54 @@ public class MicrophoneListener : MonoBehaviour
 
     void OnGUI()
     {
-        GUILayout.BeginVertical();
-        foreach (var device in Microphone.devices)
-        {
-            if (this.selectedDevice == device)
-            {
-                GUI.contentColor = Color.cyan;
-            }
-            else
-            {
-                GUI.contentColor = Color.white;
-            }
-            if (GUILayout.Button(device))
-            {
-                this.selectedDevice = device;
-            }
-        }
-        GUI.contentColor = Color.white;
+		if (NetworkManager.gameStarted)
+		{
+			GUILayout.BeginVertical ();
+			foreach (var device in Microphone.devices) {
+					if (this.selectedDevice == device) {
+							GUI.contentColor = Color.cyan;
+					} else {
+							GUI.contentColor = Color.white;
+					}
+					if (GUILayout.Button (device)) {
+							this.selectedDevice = device;
+					}
+			}
+			GUI.contentColor = Color.white;
 
-        GUILayout.Label("Recording frequency:");
-        string newFreqString = GUILayout.TextField(recordingFrequency.ToString());
-        int.TryParse(newFreqString, out recordingFrequency);
+			GUILayout.Label ("Recording frequency:");
+			string newFreqString = GUILayout.TextField (recordingFrequency.ToString ());
+			int.TryParse (newFreqString, out recordingFrequency);
 
-        GUILayout.Space(50);
-        if (selectedDevice != null)
-        {
-            if (GUILayout.Button(isRecording ? "Stop" : "Record"))
-            {
-                isRecording = !isRecording;
-                if (isRecording)
-                {
-                    RecordButtonPressed();
-                }
-                else
-                {
-                    StopButtonPressed();
-                }
-            }
-            if (GUILayout.Button("Play"))
-            {
-                PlaySoundClip();
-            }
-        }
-        GUILayout.Space(25);
-        foreach (var recording in this.recordings)
-        {           
-            if (this.currentRecordingClip == recording)
-            {
-                GUI.contentColor = Color.cyan;
-            }
-            else
-            {
-                GUI.contentColor = Color.white;
-            }
+			GUILayout.Space (50);
+			if (selectedDevice != null) {
+					if (GUILayout.Button (isRecording ? "Stop" : "Record")) {
+							isRecording = !isRecording;
+							if (isRecording) {
+									RecordButtonPressed ();
+							} else {
+									StopButtonPressed ();
+							}
+					}
+					if (GUILayout.Button ("Play")) {
+							PlaySoundClip ();
+					}
+			}
+			GUILayout.Space (25);
+			foreach (var recording in this.recordings) {           
+					if (this.currentRecordingClip == recording) {
+							GUI.contentColor = Color.cyan;
+					} else {
+							GUI.contentColor = Color.white;
+					}
 
-            if (GUILayout.Button(recording.name))
-            {
-                this.currentRecordingClip = recording;
-                PlaySoundClip();
-            }
-        }
-        GUILayout.EndVertical();
+					if (GUILayout.Button (recording.name)) {
+							this.currentRecordingClip = recording;
+							PlaySoundClip ();
+					}
+			}
+			GUILayout.EndVertical ();
+		}
     }
 
     private void RecordButtonPressed()
@@ -109,4 +101,9 @@ public class MicrophoneListener : MonoBehaviour
     {
         this.audio.PlayOneShot(currentRecordingClip);
     }
+
+	private void OnGameStart()
+	{
+		//Do something related to the game starting
+	}
 }

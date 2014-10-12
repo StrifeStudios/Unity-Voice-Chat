@@ -124,6 +124,7 @@ public class NetworkManager : Singleton<NetworkManager>
 		//send the start of game event
 		if (OnGameStart != null)
 		{
+			Debug.Log("Game Starting!");
 			OnGameStart();
 			gameStarted = true;
 		}
@@ -131,6 +132,8 @@ public class NetworkManager : Singleton<NetworkManager>
 	
 	void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
+		gameStarted = false;
+
 		if (Network.isServer)
 			Debug.Log("Local server connection disconnected");
 		else
@@ -143,13 +146,7 @@ public class NetworkManager : Singleton<NetworkManager>
 	
 	#region GUI
 	private void OnGUI()
-	{
-		if (!gameStarted)
-		{
-			//Draw the background to the menu
-			//GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Util.whiteSquare);
-		}
-		
+	{		
 		if (!Network.isClient && !Network.isServer)
 		{
 			
@@ -265,7 +262,7 @@ public class NetworkManager : Singleton<NetworkManager>
 		GUILayout.FlexibleSpace();
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		GUILayout.Label("Iron Strife RTS", titleStyle);
+		GUILayout.Label("Iron Strife Voice Chat", titleStyle);
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 		GUILayout.FlexibleSpace();
