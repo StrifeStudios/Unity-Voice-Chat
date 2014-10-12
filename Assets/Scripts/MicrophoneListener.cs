@@ -10,8 +10,6 @@ public class MicrophoneListener : MonoBehaviour
     private AudioClip audioClip;
 	private bool isRecording = false;
 
-    private string frequencyInputString = "10000";
-
     void Awake()
     {
         var options = Microphone.devices;
@@ -46,11 +44,8 @@ public class MicrophoneListener : MonoBehaviour
         GUI.contentColor = Color.white;
 
         GUILayout.Label("Recording frequency:");
-        string newFreqString = GUILayout.TextField(frequencyInputString);
-        if (int.TryParse(newFreqString, out recordingFrequency))
-        {
-            this.frequencyInputString = newFreqString;
-        }
+        string newFreqString = GUILayout.TextField(recordingFrequency.ToString());
+        int.TryParse(newFreqString, out recordingFrequency);
 
         GUILayout.Space(50);
         if (selectedDevice != null)
