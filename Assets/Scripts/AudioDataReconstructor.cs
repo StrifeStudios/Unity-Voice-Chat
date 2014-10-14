@@ -71,6 +71,9 @@ public class AudioDataReconstructor : MonoBehaviour
         {
             Debug.Log("Read boundary reached write boundary.");
             audio.Pause();
+            this.audio.timeSamples = 0;
+            this.writeBoundary = 0;
+            this.readBoundary = 0;
         }
     }
 }
