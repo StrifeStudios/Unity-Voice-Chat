@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// Reconstructs audio data from an IAudioDataProvider into an audio clip.
@@ -10,7 +11,10 @@ public class AudioDataReconstructor : MonoBehaviour
     private IAudioDataProvider dataSource;
     [SerializeField]
     private int recordingFrequency = 10000;
-	private Queue<AudioFrameData> audioQueue = new Queue<AudioFrameData>();
+    private Queue<AudioFrameData> audioQueue = new Queue<AudioFrameData>();
+    private bool isPlaying = false;
+    private int numChannels = 1;
+    private int writeBoundary;
 
     public IAudioDataProvider DataSource
     {
@@ -29,6 +33,12 @@ public class AudioDataReconstructor : MonoBehaviour
         }
     }
 
+    void Awake()
+    {
+        this.audio.clip = AudioClip.Create("Reconstructed", 100 * recordingFrequency, this.numChannels, this.recordingFrequency, false, false, null, OnAudioClipSetPosition);
+        this.writeBoundary = 0;
+    }
+
     public int RecordingFrequency
     {
         get { return recordingFrequency; }
@@ -38,35 +48,21 @@ public class AudioDataReconstructor : MonoBehaviour
     private void OnAudioDataReceived(AudioFrameData frameData)
     {
         audioQueue.Enqueue(frameData);
-        Play();
-    }
-
-	private bool isPlaying = false;
-	private void Play()
-	{
-        if (!isPlaying)
+        this.audio.clip.SetData(frameData.AudioData, this.writeBoundary);
+        this.writeBoundary += frameData.AudioData.Length;
+        if (!this.audio.isPlaying)
         {
-            isPlaying = true;
-            StartCoroutine(PlayAudio());
+            this.audio.Play();
         }
     }
 
-	private IEnumerator PlayAudio()
-	{
-        while (audioQueue.Count > 0)
+    private void OnAudioClipSetPosition(int position)
+    {
+        if (position >= this.writeBoundary)
         {
-            if (audio.isPlaying)
-            {
-                yield return new WaitForFixedUpdate();
-            } 
-            else
-            {
-                AudioFrameData frameData = audioQueue.Dequeue();
-                audio.clip = AudioClip.Create("reconstructed", frameData.AudioData.Length, frameData.NumChannels, recordingFrequency, false, false);
-                audio.clip.SetData(frameData.AudioData, 0);
-                audio.Play();
-            }
+            Debug.Log("Read: " + position + ", Write: " + writeBoundary);
+            audio.Stop();
+            audio.timeSamples = this.writeBoundary;
         }
-        isPlaying = false;
     }
 }

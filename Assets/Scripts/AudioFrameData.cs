@@ -1,6 +1,7 @@
 ﻿/// <summary>
 /// Immutable structure representing audio data for a single frame.
 /// </summary>
+using System.Collections.Generic;
 public struct AudioFrameData
 {
     public readonly float[] AudioData;
