@@ -11,10 +11,10 @@ public class AudioDataReconstructor : MonoBehaviour
     private IAudioDataProvider dataSource;
     [SerializeField]
     private int recordingFrequency = 10000;
-    private Queue<AudioFrameData> audioQueue = new Queue<AudioFrameData>();
-    private bool isPlaying = false;
     private int numChannels = 1;
-    private int writeBoundary;
+    private int writeBoundary = 0;
+    private int readBoundary = 0;
+    private int minBufferLength = 2500;
 
     public IAudioDataProvider DataSource
     {
@@ -35,8 +35,16 @@ public class AudioDataReconstructor : MonoBehaviour
 
     void Awake()
     {
-        this.audio.clip = AudioClip.Create("Reconstructed", 100 * recordingFrequency, this.numChannels, this.recordingFrequency, false, false, null, OnAudioClipSetPosition);
-        this.writeBoundary = 0;
+        this.audio.clip = AudioClip.Create("Reconstructed", 100 * recordingFrequency, this.numChannels, this.recordingFrequency, false, false);
+    }
+
+    void Update()
+    {
+        if (audio.isPlaying)
+        {
+            int currentPosition = audio.timeSamples;
+            OnAudioClipPositionUpdated(currentPosition);
+        }
     }
 
     public int RecordingFrequency
@@ -47,22 +55,22 @@ public class AudioDataReconstructor : MonoBehaviour
 
     private void OnAudioDataReceived(AudioFrameData frameData)
     {
-        audioQueue.Enqueue(frameData);
         this.audio.clip.SetData(frameData.AudioData, this.writeBoundary);
         this.writeBoundary += frameData.AudioData.Length;
-        if (!this.audio.isPlaying)
+        if (readBoundary + minBufferLength <= writeBoundary && !audio.isPlaying)
         {
             this.audio.Play();
         }
     }
 
-    private void OnAudioClipSetPosition(int position)
+    private void OnAudioClipPositionUpdated(int position)
     {
-        if (position >= this.writeBoundary)
+        Debug.Log("OnAudioRead: " + position);
+        readBoundary = position;
+        if (readBoundary >= writeBoundary)
         {
-            Debug.Log("Read: " + position + ", Write: " + writeBoundary);
-            audio.Stop();
-            audio.timeSamples = this.writeBoundary;
+            Debug.Log("Read boundary reached write boundary.");
+            audio.Pause();
         }
     }
 }
