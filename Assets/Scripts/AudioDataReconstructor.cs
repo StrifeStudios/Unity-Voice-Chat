@@ -35,7 +35,7 @@ public class AudioDataReconstructor : MonoBehaviour
     private void OnAudioDataReceived(AudioFrameData frameData)
     {
         // TODO: Make this dynamically fill an audio clip rather than create a new one every frame.
-        audio.clip = AudioClip.Create("reconstructed", frameData.AudioData.Length, frameData.NumChannels, recordingFrequency, true, false);
+        audio.clip = AudioClip.Create("reconstructed", frameData.AudioData.Length, frameData.NumChannels, recordingFrequency, false, false);
         audio.clip.SetData(frameData.AudioData, 0);
         if (!audio.isPlaying)
             audio.Play();
