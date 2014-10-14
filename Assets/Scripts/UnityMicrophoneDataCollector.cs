@@ -4,16 +4,23 @@
 using UnityEngine;
 public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
 {
+    [SerializeField]
+    private int recordingFrequency = 10000;
+    private AudioClip __recordingClip;
+    private int lastSample = 0;
+    private KeyCode hotkey = KeyCode.BackQuote;
+    private string currentLabel = "Stopped";
+
     /// <summary>
     /// The AudioClip to monitor for recording and whose data will be broadcasted.
     /// </summary>
-    public AudioClip RecordingClip
+    private AudioClip RecordingClip
     {
-        get { return recordingClip; }
+        get { return __recordingClip; }
         set
         {
-            recordingClip = value;
-            if (recordingClip == null)
+            __recordingClip = value;
+            if (__recordingClip == null)
             {
                 this.enabled = false;
             }
@@ -26,20 +33,45 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
         }
     }
 
-    private AudioClip recordingClip;
-    private int lastSample = 0;
     private void Update()
     {
+        if (Input.GetKeyDown(hotkey))
+        {
+            StartRecording();
+        }
+        else if (Input.GetKeyUp(hotkey))
+        {
+            StopRecording();
+        }
+
         int recordingPosition = Microphone.GetPosition(null);
 
         int diff = recordingPosition - lastSample;
         if (diff > 0)
         {
-            float[] samples = new float[diff * recordingClip.channels];
-            recordingClip.GetData(samples, lastSample);
-            OnAudioDataReceived(samples, recordingClip.channels);
+            float[] samples = new float[diff * __recordingClip.channels];
+            __recordingClip.GetData(samples, lastSample);
+            OnAudioDataReceived(samples, __recordingClip.channels);
         }
         lastSample = recordingPosition;
+    }
+
+    void OnGUI()
+    {
+        GUI.color = Color.red;
+        GUI.Label(new Rect(Screen.width * .5f, Screen.height * .5f, 300, 300), currentLabel);
+    }
+
+    public void StartRecording(string deviceName = null)
+    {
+        currentLabel = "Recording";
+        this.RecordingClip = Microphone.Start(deviceName, false, 100, this.recordingFrequency);
+    }
+
+    public void StopRecording(string deviceName = null)
+    {
+        currentLabel = "Stopped";
+        Microphone.End(deviceName);
     }
 
     // IAudioDataProvider implementation

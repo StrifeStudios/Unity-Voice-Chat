@@ -22,34 +22,9 @@ public class UnityVoiceChatController_Client : MonoBehaviour
         audioReconstructor.DataSource = this.tunnel;
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(hotkey))
-        {
-            StartRecording();
-        }
-        else if (Input.GetKeyUp(hotkey))
-        {
-            StopRecording();
-        }
-    }
-
     private void OnConnectedToServer()
     {
         Debug.Log("Connected.");
-        this.tunnel.RemoteTarget = Network.connections[0];
-    }
-
-    public void StartRecording(string deviceName = null)
-    {
-        Debug.Log("Starting Recording.");
-        this.recordingClip = Microphone.Start(deviceName, false, 100, recordingFrequency);
-        this.microphoneDataCollector.RecordingClip = this.recordingClip;
-    }
-
-    public void StopRecording(string deviceName = null)
-    {
-        Debug.Log("Stopping recording.");
-        Microphone.End(deviceName);
+        this.tunnel.RemoteTargets = new System.Collections.Generic.List<NetworkPlayer>() { Network.connections[0] };
     }
 }

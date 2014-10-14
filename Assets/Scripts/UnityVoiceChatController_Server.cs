@@ -3,27 +3,25 @@ using UnityEngine;
 
 public class UnityVoiceChatController_Server : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject audioEndpointPrefab;
     private List<AudioDataTunnel> clientTunnels = new List<AudioDataTunnel>();
 
     private void Awake()
     {
-        AudioDataTunnel tunnel = this.GetComponent<AudioDataTunnel>();
-        tunnel.AudioDataReceived += OnAudioDataReceived;
-    }
-
-    private void OnAudioDataReceived(AudioFrameData frameData)
-    {
-        foreach (AudioDataTunnel tunnel in this.clientTunnels)
-        {
-            tunnel.SendAudioDataToRemote(frameData);
-        }
+        this.audioEndpointPrefab = Resources.Load<GameObject>("AudioEndpointPrefab");
     }
 
     private void OnPlayerConnected(NetworkPlayer player)
     {
-        AudioDataTunnel newTunnel = this.gameObject.AddComponent<AudioDataTunnel>();
-        newTunnel.name = string.Format("Player_{0}_Tunnel", player.externalIP);
-        newTunnel.RemoteTarget = player;
-        clientTunnels.Add(newTunnel);
+        foreach (var tunnel in this.clientTunnels)
+        {
+            tunnel.RemoteTargets.Add(player);
+        }
+
+        GameObject newAudioEndpoint = (GameObject)Network.Instantiate(audioEndpointPrefab, Vector3.zero, Quaternion.identity, 0);
+        newAudioEndpoint.networkView.RPC("NotifyOwnership", player);
+        newAudioEndpoint.GetComponent<VoiceChatEndpoint>().ServerInitialize(player);
+        clientTunnels.Add(newAudioEndpoint.GetComponent<AudioDataTunnel>());
     }
 }

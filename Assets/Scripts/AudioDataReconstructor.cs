@@ -18,8 +18,11 @@ public class AudioDataReconstructor : MonoBehaviour
             {
                 this.dataSource.AudioDataReceived -= OnAudioDataReceived;
             }
-            this.dataSource = value;
-            this.dataSource.AudioDataReceived += OnAudioDataReceived;
+            if (value != null)
+            {
+                this.dataSource = value;
+                this.dataSource.AudioDataReceived += OnAudioDataReceived;
+            }
         }
     }
 

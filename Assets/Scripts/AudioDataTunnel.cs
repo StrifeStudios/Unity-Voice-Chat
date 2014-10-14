@@ -1,16 +1,18 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// A component which handles relaying AudioClip frame data in a Unity-Networking-friendly way.
 /// </summary>
 public class AudioDataTunnel : MonoBehaviour, IAudioDataProvider
 {
-    private NetworkPlayer remoteTarget;
-    public NetworkPlayer RemoteTarget
+    [SerializeField]
+    private List<NetworkPlayer> remoteTargets;
+    public List<NetworkPlayer> RemoteTargets
     {
-        get { return remoteTarget; }
-        set { remoteTarget = value; }
+        get { return remoteTargets; }
+        set { remoteTargets = value; }
     }
 
     // IAudioDataProvider implementation
@@ -26,12 +28,15 @@ public class AudioDataTunnel : MonoBehaviour, IAudioDataProvider
 
     public void SendAudioDataToRemote(AudioFrameData audioFramedata)
     {
-        if (remoteTarget.ipAddress == "unassigned")
+        foreach (NetworkPlayer remoteTarget in this.remoteTargets)
         {
-            throw new InvalidOperationException("No remote target set for audio tunnel.");
+            if (remoteTarget.ipAddress == "unassigned")
+            {
+                throw new InvalidOperationException("No remote target set for audio tunnel.");
+            }
+            byte[] bytes = Util.ToByteArrayBlockCopy(audioFramedata.AudioData);
+            networkView.RPC("ReadAudioData_Remote", remoteTarget, bytes, audioFramedata.NumChannels);
         }
-        byte[] bytes = Util.ToByteArrayBlockCopy(audioFramedata.AudioData);
-        networkView.RPC("ReadAudioData_Remote", remoteTarget, bytes, audioFramedata.NumChannels);
     }
 
     [RPC]
