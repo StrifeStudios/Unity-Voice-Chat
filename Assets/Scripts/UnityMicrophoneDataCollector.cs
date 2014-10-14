@@ -28,6 +28,7 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
 
     private AudioClip recordingClip;
     private int lastSample = 0;
+
     private void Update()
     {
         int recordingPosition = Microphone.GetPosition(null);
