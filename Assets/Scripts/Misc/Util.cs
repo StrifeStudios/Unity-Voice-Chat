@@ -34,6 +34,13 @@ public class Util : Singleton<Util>
         return floatArray;
     }
 
+    public static float[] ToFloatArray(short[] shortArray)
+    {
+        byte[] byteArray = new byte[shortArray.Length * 2];
+        Buffer.BlockCopy(shortArray, 0, byteArray, 0, shortArray.Length);
+        return ToFloatArray(byteArray);
+    }
+
     public static byte[] ToByteArrayBlockCopy(float[] floatArray)
     {
         int byteCount = floatArray.Length * 4;
