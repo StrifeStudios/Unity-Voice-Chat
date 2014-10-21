@@ -5,7 +5,6 @@ using System.Linq;
 public class VoiceChatEndpoint : MonoBehaviour
 {
     private NetworkPlayer owner;
-    private AudioDataTunnel audioTunnel;
 
     public NetworkPlayer Owner
     {
@@ -20,21 +19,26 @@ public class VoiceChatEndpoint : MonoBehaviour
 
     void ProxyInitialize()
     {
-        AudioDataTunnel tunnel = this.GetComponent<AudioDataTunnel>();
+        ByteDataTunnel tunnel = this.GetComponent<ByteDataTunnel>();
+        NSpeexAudioProcessor nSpeexProcessor = this.GetComponent<NSpeexAudioProcessor>();
         AudioDataReconstructor audioReconstructor = this.GetComponent<AudioDataReconstructor>();
-        audioReconstructor.DataSource = tunnel;
+        tunnel.DataReceived += nSpeexProcessor.DecodeData;
+        audioReconstructor.DataSource = nSpeexProcessor;
     }
 
     [RPC]
     public void NotifyOwnership()
     {
         this.owner = Network.player;
-        AudioDataTunnel tunnel = this.GetComponent<AudioDataTunnel>();
+
+        ByteDataTunnel tunnel = this.GetComponent<ByteDataTunnel>();
+        NSpeexAudioProcessor nSpeexProcessor = this.GetComponent<NSpeexAudioProcessor>();
         tunnel.RemoteTargets = new System.Collections.Generic.List<NetworkPlayer>() { Network.connections[0] };
 
         Debug.Log("I am the owner of " + this.gameObject.name + ", enabling the microphone collection for that audio tunnel.");
         UnityMicrophoneDataCollector microphone = this.gameObject.AddComponent<UnityMicrophoneDataCollector>();
-        microphone.AudioDataReceived += tunnel.SendAudioDataToRemote;
+        microphone.AudioDataReceived += nSpeexProcessor.EncodeData;
+        nSpeexProcessor.AudioFrameEncoded += tunnel.SendDataToRemote;
     }
 
     public void ServerInitialize(NetworkPlayer owner)
@@ -42,7 +46,7 @@ public class VoiceChatEndpoint : MonoBehaviour
         this.owner = owner;
         AudioDataReconstructor audioReconstructor = this.GetComponent<AudioDataReconstructor>();
         audioReconstructor.DataSource = null;
-        AudioDataTunnel tunnel = this.GetComponent<AudioDataTunnel>();
+        ByteDataTunnel tunnel = this.GetComponent<ByteDataTunnel>();
         List<NetworkPlayer> targets = new List<NetworkPlayer>(Network.connections.Length - 1);
         foreach (NetworkPlayer player in Network.connections)
         {
@@ -53,7 +57,7 @@ public class VoiceChatEndpoint : MonoBehaviour
         }
 
         tunnel.RemoteTargets = targets;
-        tunnel.AudioDataReceived += tunnel.SendAudioDataToRemote;
+        tunnel.DataReceived += tunnel.SendDataToRemote;
     }
 
     void OnPlayerDisconnected(NetworkPlayer player)

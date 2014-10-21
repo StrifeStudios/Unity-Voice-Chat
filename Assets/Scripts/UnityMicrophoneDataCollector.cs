@@ -1,15 +1,32 @@
-﻿/// <summary>
+﻿using System;
+/// <summary>
 /// Collects microphone data via the Unity API and broadcasts that AudioClip data as it is becomes available.
 /// </summary>
 using UnityEngine;
 public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
 {
+
+    private bool printedToFile;
+
+
     [SerializeField]
-    private int recordingFrequency = 10000;
+    private int recordingFrequency = 16000;
     private AudioClip __recordingClip;
     private int lastSample = 0;
     private KeyCode hotkey = KeyCode.BackQuote;
     private string currentLabel = "Stopped";
+    private DataAccumulationBuffer<float> accumulator;
+
+    private void Awake()
+    {
+        accumulator = new DataAccumulationBuffer<float>(320);
+        accumulator.DataChunkFilled += OnDataChunkFilled;
+    }
+
+    private void OnDataChunkFilled(float[] buffer, int startingIndex)
+    {
+        OnAudioDataReceived(buffer, this.numChannels);
+    }
 
     /// <summary>
     /// The AudioClip to monitor for recording and whose data will be broadcasted.
@@ -27,6 +44,7 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
             else
             {
                 this.enabled = true;
+                this.numChannels = __recordingClip.channels;
             }
 
             lastSample = 0;
@@ -51,9 +69,14 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
         {
             float[] samples = new float[diff * __recordingClip.channels];
             __recordingClip.GetData(samples, lastSample);
-            OnAudioDataReceived(samples, __recordingClip.channels);
+            AccumulateData(samples);
         }
         lastSample = recordingPosition;
+    }
+
+    private void AccumulateData(float[] samples)
+    {
+        accumulator.AccumulateData(samples);
     }
 
     void OnGUI()
@@ -76,12 +99,18 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
 
     // IAudioDataProvider implementation
     public event AudioDataReceivedEventHandler AudioDataReceived;
+    private int numChannels;
     public void OnAudioDataReceived(float[] data, int numChannels)
     {
         if (AudioDataReceived != null)
         {
             AudioFrameData frameData = new AudioFrameData(data, numChannels);
             AudioDataReceived(frameData);
+        }
+        if (!printedToFile)
+        {
+            Util.PrintToFile(data, "received" + Util.CurrentTimeStamp);
+            printedToFile = true;
         }
     }
 }

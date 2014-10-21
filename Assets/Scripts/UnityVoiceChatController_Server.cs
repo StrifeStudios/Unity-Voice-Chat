@@ -5,7 +5,7 @@ public class UnityVoiceChatController_Server : MonoBehaviour
 {
     [SerializeField]
     private GameObject audioEndpointPrefab;
-    private List<AudioDataTunnel> clientTunnels = new List<AudioDataTunnel>();
+    private List<ByteDataTunnel> clientTunnels = new List<ByteDataTunnel>();
 
     private void Awake()
     {
@@ -22,6 +22,6 @@ public class UnityVoiceChatController_Server : MonoBehaviour
         GameObject newAudioEndpoint = (GameObject)Network.Instantiate(audioEndpointPrefab, Vector3.zero, Quaternion.identity, 0);
         newAudioEndpoint.networkView.RPC("NotifyOwnership", player);
         newAudioEndpoint.GetComponent<VoiceChatEndpoint>().ServerInitialize(player);
-        clientTunnels.Add(newAudioEndpoint.GetComponent<AudioDataTunnel>());
+        clientTunnels.Add(newAudioEndpoint.GetComponent<ByteDataTunnel>());
     }
 }

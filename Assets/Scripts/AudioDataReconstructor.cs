@@ -10,7 +10,7 @@ public class AudioDataReconstructor : MonoBehaviour
 {
     private IAudioDataProvider dataSource;
     [SerializeField]
-    private int recordingFrequency = 10000;
+    private int recordingFrequency = 16000;
     private int numChannels = 1;
     private int writeBoundary = 0;
     private int readBoundary = 0;

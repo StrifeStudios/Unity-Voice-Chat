@@ -10,9 +10,10 @@ GameObject:
   - 4: {fileID: 400000}
   - 82: {fileID: 8200000}
   - 114: {fileID: 11400004}
-  - 114: {fileID: 11400002}
   - 148: {fileID: 14800000}
   - 114: {fileID: 11400000}
+  - 114: {fileID: 11400002}
+  - 114: {fileID: 11400006}
   m_Layer: 0
   m_Name: AudioEndpointPrefab
   m_TagString: Untagged
@@ -104,7 +105,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a9ee8c5fbe8b4f4f91b723a74774d51, type: 3}
+  m_Script: {fileID: 11500000, guid: 04fa3607749ee05439b92cfdcc34bac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &11400004
@@ -118,7 +119,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d2dce4e5c1d4e842addd33e775b2fde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordingFrequency: 10000
+  recordingFrequency: 16000
+--- !u!114 &11400006
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52206712a2947643be1188b47b56f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bandMode: 1
 --- !u!148 &14800000
 NetworkView:
   m_ObjectHideFlags: 1

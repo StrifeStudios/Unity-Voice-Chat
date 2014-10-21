@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.IO;
 
 public class Util : Singleton<Util>
 {
@@ -55,5 +56,60 @@ public class Util : Singleton<Util>
         float[] floatArray = new float[floatCount];
         Buffer.BlockCopy(floatArray, 0, byteArray, 0, byteArray.Length);
         return floatArray;
+    }
+
+    public static void ConvertToShortArray(float[] input, short[] output)
+    {
+        if (output.Length < input.Length)
+        {
+            throw new System.ArgumentException("in: " + input.Length + ", out: " + output.Length);
+        }
+        for (int i = 0; i < input.Length; ++i)
+        {
+            output[i] = (short)Mathf.Clamp((int)(input[i] * 32767.0f), short.MinValue, short.MaxValue);
+        }
+    }
+
+    public static void ConvertToFloatArray(short[] input, float[] output)
+    {
+        if (output.Length < input.Length)
+        {
+            throw new System.ArgumentException("in: " + input.Length + ", out: " + output.Length);
+        }
+        for (int i = 0; i < input.Length; ++i)
+        {
+            output[i] = (float)Mathf.Clamp(((float)input[i] / 32767.0f), -1.0f, 1.0f);
+        }
+    }
+
+    public static void PrintToFile(float[] data, string fileName)
+    {
+        using (var writer = File.CreateText(fileName + "_floats.txt"))
+        {
+            for (int g = 0; g < data.Length; g++)
+            {
+                writer.WriteLine(data[g]);
+            }
+        }
+    }
+
+    public static void PrintToFile(byte[] data, string fileName)
+    {
+        using (var writer = File.CreateText(fileName + "_bytes.txt"))
+        {
+            for (int g = 0; g < data.Length; g++)
+            {
+                writer.WriteLine(data[g]);
+            }
+        }
+    }
+
+    public static string CurrentTimeStamp
+    {
+        get
+        {
+            DateTime now = DateTime.Now;
+            return string.Format("{0}-{1}-{2}-{3}", now.Hour, now.Minute, now.Second, now.Millisecond);
+        }
     }
 }
