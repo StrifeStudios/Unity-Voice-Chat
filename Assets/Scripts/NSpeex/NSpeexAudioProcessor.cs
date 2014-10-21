@@ -41,8 +41,11 @@ public class NSpeexAudioProcessor : MonoBehaviour, IAudioDataProvider
         Util.ConvertToShortArray(frameData.AudioData, shortData);
         Byte[] encodedBytes = new Byte[shortData.Length * 2];
         int numEncodedBytes = encoder.Encode(shortData, 0, encoder.FrameSize, encodedBytes, 0, encodedBytes.Length);
-
-        OnAudioFrameEncoded(encodedBytes, numEncodedBytes);
+        int difference = encodedBytes.Length - numEncodedBytes;
+        Debug.Log("Wasted bytes: " + difference);
+        byte[] trimmedBytes = new byte[numEncodedBytes];
+        Buffer.BlockCopy(encodedBytes, 0, trimmedBytes, 0, numEncodedBytes);
+        OnAudioFrameEncoded(trimmedBytes, numEncodedBytes);
     }
 
     private void OnAudioFrameEncoded(byte[] encodedBytes, int numEncodedBytes)

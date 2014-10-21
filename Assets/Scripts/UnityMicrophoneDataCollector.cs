@@ -16,15 +16,25 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
     private KeyCode hotkey = KeyCode.BackQuote;
     private string currentLabel = "Stopped";
     private DataAccumulationBuffer<float> accumulator;
+    private int numChannels;
+    private int frameSize = 320;
+    private float[] localFrameStorage = new float[320];
+
 
     private void Awake()
     {
-        accumulator = new DataAccumulationBuffer<float>(320);
+        accumulator = new DataAccumulationBuffer<float>(frameSize);
         accumulator.DataChunkFilled += OnDataChunkFilled;
     }
 
     private void OnDataChunkFilled(float[] buffer, int startingIndex)
     {
+        if (buffer.Length != frameSize)
+        {
+            Buffer.BlockCopy(buffer, startingIndex, this.localFrameStorage, 0, localFrameStorage.Length * 4);
+            buffer = this.localFrameStorage;
+        }
+
         OnAudioDataReceived(buffer, this.numChannels);
     }
 
@@ -99,7 +109,6 @@ public class UnityMicrophoneDataCollector : MonoBehaviour, IAudioDataProvider
 
     // IAudioDataProvider implementation
     public event AudioDataReceivedEventHandler AudioDataReceived;
-    private int numChannels;
     public void OnAudioDataReceived(float[] data, int numChannels)
     {
         if (AudioDataReceived != null)
